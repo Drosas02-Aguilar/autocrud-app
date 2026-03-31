@@ -25,8 +25,8 @@ export class AutoService {
     return this.http.get<Result<Auto>>(`${this.apiUrl}/${id}`);
   }
 
-  consutarPorMarca(marca: string): Observable<Result<Auto>> {
-    return this.http.get<Result<Auto>>(`${this.apiUrl}/marca/${marca}`);
+  consutarPorMarca(marca: string): Observable<Result<Auto[]>> {
+    return this.http.get<Result<Auto[]>>(`${this.apiUrl}/marca/${marca}`);
   }
 
   consultarPorAgencias(idAgencia: number): Observable<Result<Auto[]>> {

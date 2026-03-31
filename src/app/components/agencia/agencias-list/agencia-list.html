@@ -1,1 +1,187 @@
-<p>agencia-list works!</p>
+<div class="page-container">
+
+  <!-- Header -->
+  <div class="d-flex align-items-start justify-content-between mb-4">
+    <div>
+      <h1 class="page-title mb-1">
+        <i class="bi bi-building me-2" style="color: var(--purple-main);"></i>Agencias
+      </h1>
+      <p class="page-subtitle mb-0">Gestión de agencias automotrices</p>
+    </div>
+    <a routerLink="/agencias/nueva" class="btn btn-purple">
+      <i class="bi bi-plus-lg me-1"></i> Nueva Agencia
+    </a>
+  </div>
+
+  <!-- Toast -->
+  @if (message) {
+    <div class="mb-3" [class]="messageType === 'success' ? 'toast-success' : 'toast-error'">
+      <i class="me-2"
+         [class]="messageType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'">
+      </i>{{ message }}
+    </div>
+  }
+
+  <!-- Buscador -->
+  <div class="card mb-4">
+    <div class="card-body py-3 d-flex gap-2 align-items-center">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0"
+              style="border-color: var(--border-color);">
+          <i class="bi bi-search" style="color: var(--purple-mid);"></i>
+        </span>
+        <input
+          type="text"
+          [(ngModel)]="searchCiudad"
+          placeholder="Filtrar por ciudad..."
+          class="form-control border-start-0 ps-0"
+          style="border-color: var(--border-color);"
+          (ngModelChange)="buscarPorCiudad()"
+        />
+        @if (searchCiudad) {
+          <button class="btn btn-outline-secondary" style="border-color: var(--border-color);"
+                  (click)="limpiarFiltro()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        }
+      </div>
+      <span class="text-muted small text-nowrap">
+        {{ filteredAgencias.length }} resultado{{ filteredAgencias.length !== 1 ? 's' : '' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="card">
+      <div class="card-body d-flex align-items-center gap-3 py-4 text-muted">
+        <div class="spinner-border spinner-border-sm"
+             style="color: var(--purple-main);" role="status"></div>
+        <span>Cargando agencias...</span>
+      </div>
+    </div>
+  }
+
+  <!-- Tabla -->
+  @if (!loading && filteredAgencias.length > 0) {
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table data-table mb-0">
+            <thead>
+              <tr>
+                <th style="width:70px;">#ID</th>
+                <th>Nombre</th>
+                <th>Ciudad</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th style="width:160px;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ag of filteredAgencias; track ag.idagencia) {
+                <tr>
+                  <td><span class="id-badge">{{ ag.idagencia }}</span></td>
+                  <td class="fw-bold">{{ ag.nombre }}</td>
+                  <td><span class="city-chip">{{ ag.ciudad }}</span></td>
+                  <td class="text-muted small">{{ ag.direccion }}</td>
+                  <td>
+                    <code style="color: var(--purple-mid); font-size: .85rem;">
+                      {{ ag.telefono }}
+                    </code>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      <a [routerLink]="['/agencias/editar', ag.idagencia]"
+                         class="btn btn-sm btn-outline-info fw-semibold"
+                         style="border-radius:8px; font-size:.8rem;">
+                        <i class="bi bi-pencil me-1"></i>Editar
+                      </a>
+                      <button class="btn btn-sm btn-outline-danger fw-semibold"
+                              style="border-radius:8px; font-size:.8rem;"
+                              (click)="confirmarEliminar(ag)">
+                        <i class="bi bi-trash me-1"></i>Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Footer con conteo -->
+      <div class="card-footer bg-white d-flex justify-content-between align-items-center py-2 px-3"
+           style="border-top: 1px solid var(--border-color); border-radius: 0 0 14px 14px;">
+        <span class="text-muted small">
+          Total: <strong style="color: var(--purple-main);">{{ filteredAgencias.length }}</strong> agencia{{ filteredAgencias.length !== 1 ? 's' : '' }}
+        </span>
+        <span class="badge" style="background: var(--purple-pale); color: var(--purple-dark); font-size:.75rem;">
+          <i class="bi bi-building me-1"></i>Agencias
+        </span>
+      </div>
+    </div>
+  }
+
+  <!-- Empty state -->
+  @if (!loading && filteredAgencias.length === 0) {
+    <div class="card">
+      <div class="card-body empty-state">
+        <div style="font-size: 3.5rem; margin-bottom: 1rem;">🏢</div>
+        <h5 class="fw-bold mb-1" style="color: var(--purple-dark);">Sin resultados</h5>
+        <p class="text-muted mb-3">
+          {{ searchCiudad ? 'No hay agencias en "' + searchCiudad + '"' : 'Aún no hay agencias registradas' }}
+        </p>
+        @if (!searchCiudad) {
+          <a routerLink="/agencias/nueva" class="btn btn-purple">
+            <i class="bi bi-plus-lg me-1"></i> Crear primera agencia
+          </a>
+        } @else {
+          <button class="btn btn-outline-secondary" (click)="limpiarFiltro()">
+            <i class="bi bi-arrow-counterclockwise me-1"></i> Ver todas
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Modal confirmación eliminar -->
+  @if (deleteTarget) {
+    <div style="position:fixed; inset:0; z-index:1055;
+                background:rgba(61,26,120,0.5); backdrop-filter:blur(4px);
+                display:flex; align-items:center; justify-content:center;"
+         (click)="cancelarEliminar()">
+      <div class="card" style="max-width:420px; width:90%; border-radius:18px !important;"
+           (click)="$event.stopPropagation()">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div style="width:46px;height:46px;border-radius:12px;
+                        background:#fce8e6;display:flex;align-items:center;justify-content:center;
+                        font-size:1.3rem;flex-shrink:0;">🗑️</div>
+            <div>
+              <h5 class="fw-bold mb-0" style="color: var(--purple-dark);">¿Eliminar agencia?</h5>
+              <p class="text-muted small mb-0">Esta acción no se puede deshacer</p>
+            </div>
+          </div>
+          <div class="alert alert-danger py-2 px-3" style="border-radius:10px; font-size:.9rem;">
+            Se eliminará permanentemente <strong>{{ deleteTarget.nombre }}</strong>
+            <span class="text-muted"> — {{ deleteTarget.ciudad }}</span>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <button class="btn btn-outline-secondary fw-semibold"
+                    style="border-radius:10px;"
+                    (click)="cancelarEliminar()">
+              Cancelar
+            </button>
+            <button class="btn btn-danger fw-bold"
+                    style="border-radius:10px;"
+                    (click)="eliminar()">
+              <i class="bi bi-trash me-1"></i>Sí, eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

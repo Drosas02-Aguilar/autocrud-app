@@ -1,1 +1,95 @@
-<p>agencia-form works!</p>
+<div class="page-container">
+
+  <div class="d-flex align-items-start justify-content-between mb-4">
+    <div>
+      <h1 class="page-title mb-1">
+        <i class="bi bi-building me-2" style="color: var(--purple-main);"></i>
+        {{ isEdit ? 'Editar Agencia' : 'Nueva Agencia' }}
+      </h1>
+      <p class="page-subtitle mb-0">
+        {{ isEdit ? 'Modifica los datos de la agencia' : 'Registra una nueva agencia' }}
+      </p>
+    </div>
+    <a routerLink="/agencias" class="btn btn-outline-secondary fw-semibold"
+       style="border-radius:10px; border-color: var(--border-color); color: var(--purple-mid);">
+      <i class="bi bi-arrow-left me-1"></i> Volver
+    </a>
+  </div>
+
+  @if (message) {
+    <div class="mb-3" [class]="messageType === 'success' ? 'toast-success' : 'toast-error'">
+      <i class="me-2"
+         [class]="messageType === 'success' ? 'bi bi-check-circle-fill' : 'bi bi-exclamation-circle-fill'">
+      </i>{{ message }}
+    </div>
+  }
+
+  @if (loading) {
+    <div class="card mb-3">
+      <div class="card-body d-flex align-items-center gap-3 py-3 text-muted">
+        <div class="spinner-border spinner-border-sm"
+             style="color: var(--purple-main);" role="status"></div>
+        <span>Cargando datos...</span>
+      </div>
+    </div>
+  }
+
+  <div class="card">
+    <div class="card-body p-4">
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="row g-3">
+
+          <div class="col-md-6">
+            <label class="form-label">Nombre</label>
+            <input formControlName="nombre" type="text"
+                   class="form-control"
+                   [class.is-invalid]="f['nombre'].invalid && f['nombre'].touched"
+                   placeholder="AutoMax CDMX" />
+            <div class="invalid-feedback">Nombre requerido (mín. 3 caracteres)</div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Ciudad</label>
+            <input formControlName="ciudad" type="text"
+                   class="form-control"
+                   [class.is-invalid]="f['ciudad'].invalid && f['ciudad'].touched"
+                   placeholder="Ciudad de México" />
+            <div class="invalid-feedback">Ciudad requerida</div>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Dirección</label>
+            <input formControlName="direccion" type="text"
+                   class="form-control"
+                   [class.is-invalid]="f['direccion'].invalid && f['direccion'].touched"
+                   placeholder="Av. Insurgentes Sur 1234" />
+            <div class="invalid-feedback">Dirección requerida</div>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Teléfono</label>
+            <input formControlName="telefono" type="text"
+                   class="form-control"
+                   [class.is-invalid]="f['telefono'].invalid && f['telefono'].touched"
+                   placeholder="55-1234-5678" />
+            <div class="invalid-feedback">Teléfono requerido</div>
+          </div>
+
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <a routerLink="/agencias" class="btn btn-outline-secondary fw-semibold"
+             style="border-radius:10px;">
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-purple" [disabled]="submitting">
+            <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+            {{ submitting ? 'Guardando...' : (isEdit ? 'Actualizar' : 'Crear Agencia') }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+</div>

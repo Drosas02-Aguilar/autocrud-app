@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --purple-dark:   #3d1a78;
+  --purple-main:   #6a3bbf;
+  --purple-mid:    #9b6dde;
+  --purple-light:  #d4b8f5;
+  --purple-pale:   #f0e8ff;
+  --white:         #ffffff;
+  --text-dark:     #1e0f3a;
+  --text-mid:      #5a3f8a;
+  --text-muted:    #9880b8;
+  --border-color:  #c9aff0;
+  --success:       #1e8a4a;
+  --error:         #c0392b;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #f0e8ff 0%, #e8d5fa 50%, #ddc6f7 100%);
+  min-height: 100vh;
+  color: var(--text-dark);
+}
+
+/* NAVBAR */
+.navbar {
+  background: var(--purple-dark) !important;
+  box-shadow: 0 2px 12px rgba(61,26,120,0.35);
+}
+
+.navbar-brand {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #140909 !important;
+  letter-spacing: -0.3px;
+}
+
+.nav-link {
+  color: var(--purple-light) !important;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: .4rem .9rem !important;
+  transition: background .2s, color .2s;
+}
+
+.nav-link:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff !important;
+}
+
+.nav-link.active {
+  background: rgba(255,255,255,0.2) !important;
+  color: #fff !important;
+}
+
+.main-content {
+  padding: 2.5rem 1.5rem;
+}

@@ -2,6 +2,7 @@ import { Agencia } from "./agencia";
 
 export interface AgenciaRef {
   idagencia?: number;
+  nombre: string;
 }
 
 
@@ -13,6 +14,7 @@ export interface Auto {
   placa: string;
   color: string;
   precio: number;
+  imagen: string;
   agencia: AgenciaRef;
 }
 

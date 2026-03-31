@@ -1,5 +1,6 @@
 <div class="page-container">
 
+  <!-- Encabezado -->
   <div class="d-flex align-items-start justify-content-between mb-4">
     <div>
       <h1 class="page-title mb-1">
@@ -12,6 +13,7 @@
     </a>
   </div>
 
+  <!-- Mensajes -->
   @if (message) {
     <div class="mb-3" [class]="messageType === 'success' ? 'toast-success' : 'toast-error'">
       <i class="me-2"
@@ -21,8 +23,7 @@
   }
 
   <!-- Filtros -->
-  <!-- Filtros -->
-<div class="card mb-4">
+  <div class="card mb-4">
   <div class="card-body py-3">
     <div class="row g-2 align-items-end">
 
@@ -95,71 +96,108 @@
     </div>
   }
 
-  <!-- Cards grid -->
-  @if (!loading && autos.length > 0) {
-    <div class="row g-3">
-      @for (auto of autos; track auto.idauto) {
-        <div class="col-md-6 col-lg-4">
-          <div class="card h-100">
-            <div class="card-body d-flex flex-column gap-2 p-3">
+  <!-- Cards grid con CSS Grid -->
+  <div class="d-grid gap-4 mt-4"
+       style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+    @for (auto of autos; track auto.idauto) {
+      <div class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
 
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="id-badge">#{{ auto.idauto }}</span>
-                <span class="city-chip">{{ auto.color }}</span>
-              </div>
+          <!-- Fila superior -->
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="id-badge">#{{ auto.idauto }}</span>
+            <span class="city-chip">{{ auto.color }}</span>
+          </div>
 
-              <h5 class="fw-800 mb-0" style="color: var(--purple-dark); font-size: 1.1rem;">
+          <!-- Info + Imagen -->
+          <div class="d-flex gap-3 align-items-start">
+            <div class="d-flex flex-column gap-2 flex-grow-1">
+              <h5 class="fw-bold mb-0"
+                  style="color: var(--purple-dark); font-size: 1.1rem;">
                 {{ auto.marca }} {{ auto.modelo }}
               </h5>
 
               <div class="d-flex gap-2 flex-wrap">
                 <span class="badge rounded-pill"
-                      style="background: var(--purple-pale); color: var(--purple-dark);
-                             font-size:.78rem; font-weight:600; padding:.3rem .7rem;">
+                      style="background:var(--purple-pale); color:var(--purple-dark);
+                             font-size:.8rem; font-weight:600; padding:.35rem .75rem;">
                   <i class="bi bi-calendar3 me-1"></i>{{ auto.anio }}
                 </span>
                 <span class="badge rounded-pill"
-                      style="background: var(--purple-pale); color: var(--purple-dark);
-                             font-size:.78rem; font-weight:600; padding:.3rem .7rem;">
+                      style="background:var(--purple-pale); color:var(--purple-dark);
+                             font-size:.8rem; font-weight:600; padding:.35rem .75rem;">
                   <i class="bi bi-tag me-1"></i>{{ auto.placa }}
                 </span>
               </div>
 
-              <div class="fw-bold" style="font-size: 1.25rem; color: var(--purple-main);">
+              <div class="fw-bold"
+                   style="font-size:1.3rem; color:var(--purple-main);">
                 {{ formatPrecio(auto.precio) }}
               </div>
 
               <div class="text-muted small">
                 <i class="bi bi-building me-1"></i>
-                Agencia #{{ auto.agencia?.idagencia }}
+                Agencia: {{ auto.agencia?.nombre }}
               </div>
+            </div>
 
-              <div class="d-flex gap-2 mt-auto pt-2"
-                   style="border-top: 1px solid var(--border-color);">
-                <a [routerLink]="['/autos/editar', auto.idauto]"
-                   class="btn btn-sm flex-fill fw-semibold"
-                   style="border-radius:8px; background:#e8f4fd;
-                          color:#1a6ea8; border:1px solid #b3d7f0;">
-                  <i class="bi bi-pencil me-1"></i>Editar
-                </a>
-                <button class="btn btn-sm flex-fill fw-semibold"
-                        (click)="confirmarEliminar(auto)"
-                        style="border-radius:8px; background:#fce8e6;
-                               color:#c0392b; border:1px solid #f2b8b3;">
-                  <i class="bi bi-trash me-1"></i>Eliminar
-                </button>
-              </div>
-
+            <!-- Imagen -->
+            <div style="width:140px; height:110px; border-radius:12px;
+                        overflow:hidden; flex-shrink:0;
+                        background:var(--purple-pale);
+                        border:1px solid var(--border-color);">
+              @if (auto.imagen) {
+                <img [src]="auto.imagen"
+                     [alt]="auto.marca + ' ' + auto.modelo"
+                     style="width:100%; height:100%; object-fit:cover;" />
+              } @else {
+                <div class="d-flex align-items-center justify-content-center h-100">
+                  <i class="bi bi-car-front"
+                     style="font-size:2.5rem; color:var(--purple-mid); opacity:.35;"></i>
+                </div>
+              }
             </div>
           </div>
-        </div>
-      }
-    </div>
 
-    <div class="mt-3 text-muted small text-end">
-      Total: <strong style="color: var(--purple-main);">{{ autos.length }}</strong> auto{{ autos.length !== 1 ? 's' : '' }}
-    </div>
-  }
+          <!-- Botones -->
+          <div class="d-flex gap-2 mt-auto pt-2"
+               style="border-top:1px solid var(--border-color);">
+            <a [routerLink]="['/autos/editar', auto.idauto]"
+               class="btn btn-sm flex-fill fw-semibold"
+               style="border-radius:8px; background:#e8f4fd;
+                      color:#1a6ea8; border:1px solid #b3d7f0;">
+              <i class="bi bi-pencil me-1"></i>Editar
+            </a>
+            <button class="btn btn-sm flex-fill fw-semibold"
+                    (click)="confirmarEliminar(auto)"
+                    style="border-radius:8px; background:#fce8e6;
+                           color:#c0392b; border:1px solid #f2b8b3;">
+              <i class="bi bi-trash me-1"></i>Eliminar
+            </button>
+          </div>
+
+        </div>
+      </div>
+    }
+  </div>
+
+    <nav class="mt-4" *ngIf="totalPage > 1">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 0">
+        <button class="page-link" (click)="cambiarPagina(currentPage - 1)">Anterior</button>
+      </li>
+
+      <li class="page-item" *ngFor="let i of [].constructor(totalPage); let idx = index"
+          [class.active]="currentPage === idx">
+        <button class="page-link" (click)="cambiarPagina(idx)">{{ idx + 1 }}</button>
+      </li>
+
+      <li class="page-item" [class.disabled]="currentPage === totalPage - 1">
+        <button class="page-link" (click)="cambiarPagina(currentPage + 1)">Siguiente</button>
+      </li>
+    </ul>
+  </nav>
+
 
   <!-- Empty -->
   @if (!loading && autos.length === 0) {
@@ -189,33 +227,33 @@
          (click)="cancelarEliminar()">
       <div class="card" style="max-width:420px; width:90%; border-radius:18px !important;"
            (click)="$event.stopPropagation()">
-        <div class="card-body p-4">
-          <div class="d-flex align-items-center gap-3 mb-3">
-            <div style="width:46px;height:46px;border-radius:12px;
-                        background:#fce8e6;display:flex;align-items:center;
-                        justify-content:center;font-size:1.3rem;flex-shrink:0;">🗑️</div>
-            <div>
-              <h5 class="fw-bold mb-0" style="color: var(--purple-dark);">¿Eliminar auto?</h5>
-              <p class="text-muted small mb-0">Esta acción no se puede deshacer</p>
-            </div>
+
+                 <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div style="width:46px;height:46px;border-radius:12px;
+                      background:#fce8e6;display:flex;align-items:center;
+                      justify-content:center;font-size:1.3rem;flex-shrink:0;">🗑️</div>
+          <div>
+            <h5 class="fw-bold mb-0" style="color: var(--purple-dark);">¿Eliminar auto?</h5>
+            <p class="text-muted small mb-0">Esta acción no se puede deshacer</p>
           </div>
-          <div class="alert alert-danger py-2 px-3" style="border-radius:10px; font-size:.9rem;">
-            Se eliminará <strong>{{ deleteTarget.marca }} {{ deleteTarget.modelo }}</strong>
-            <span class="text-muted"> — {{ deleteTarget.placa }}</span>
-          </div>
-          <div class="d-flex justify-content-end gap-2 mt-3">
-            <button class="btn btn-outline-secondary fw-semibold"
-                    style="border-radius:10px;" (click)="cancelarEliminar()">
-              Cancelar
-            </button>
-            <button class="btn btn-danger fw-bold"
-                    style="border-radius:10px;" (click)="eliminar()">
-              <i class="bi bi-trash me-1"></i>Sí, eliminar
-            </button>
-          </div>
+        </div>
+        <div class="alert alert-danger py-2 px-3" style="border-radius:10px; font-size:.9rem;">
+          Se eliminará <strong>{{ deleteTarget.marca }} {{ deleteTarget.modelo }}</strong>
+          <span class="text-muted"> — {{ deleteTarget.placa }}</span>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button class="btn btn-outline-secondary fw-semibold"
+                  style="border-radius:10px;" (click)="cancelarEliminar()">
+            Cancelar
+          </button>
+          <button class="btn btn-danger fw-bold"
+                  style="border-radius:10px;" (click)="eliminar()">
+            <i class="bi bi-trash me-1"></i>Sí, eliminar
+          </button>
         </div>
       </div>
     </div>
+  </div>
   }
-
 </div>

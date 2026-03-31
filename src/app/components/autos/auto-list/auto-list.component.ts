@@ -16,6 +16,9 @@ import { AgenciaService } from '../../../services/agenciaService';
 })
 export class AutoList implements OnInit {
   autos: Auto[] = [];
+  currentPage: number =0;
+  pageSize: number = 6;
+  totalPage: number = 0;
   todosLosAutos: Auto[] = [];
   marcasDisponibles: String[] = [];
   agencias: Agencia[] = [];
@@ -54,29 +57,39 @@ export class AutoList implements OnInit {
   }
 
   cargarAutos(): void {
-    this.loading = true;
-    this.autoService.consultarAutos().subscribe({
-      next: (res: any) => {
-        const data = res?.object;
-        this.todosLosAutos = Array.isArray(data) ? data : [];
-        this.autos = [...this.todosLosAutos];
-                console.log('Response completo:', res)
+  this.loading = true;
+  this.autoService.consultarAutos(this.currentPage, this.pageSize).subscribe({
+    next: (res: any) => {
+      const pageData = res?.object; 
+      this.todosLosAutos = Array.isArray(pageData?.content) ? pageData.content : [];
+      this.autos = [...this.todosLosAutos];
 
+      console.log('Response completo:', res);
 
-        this.marcasDisponibles=[
-          ...new Set(this.todosLosAutos.map(a => a.marca).filter(Boolean))
-        ].sort();
+      this.marcasDisponibles = [
+        ...new Set(this.todosLosAutos.map(a => a.marca).filter(Boolean))
+      ].sort();
 
-        this.loading = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.showMessage('Error al cargar autos', 'error');
-        this.loading = false;
-        this.cdr.detectChanges();
-      }
-    });
+      this.totalPage = pageData?.totalPages ?? 0;
+
+      this.loading = false;
+      this.cdr.detectChanges();
+    },
+    error: () => {
+      this.showMessage('Error al cargar autos', 'error');
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  });
+}
+
+cambiarPagina(page: number): void {
+  if (page >= 0 && page < this.totalPage) {
+    this.currentPage = page;
+    this.cargarAutos();
   }
+}
+
 
   buscarPorMarca(): void {
     if(!this.filterMarca){

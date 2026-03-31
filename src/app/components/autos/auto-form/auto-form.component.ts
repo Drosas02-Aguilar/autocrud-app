@@ -23,6 +23,7 @@ export class AutoForm implements OnInit {
   submitting = false;
   message = '';
   messageType: 'success' | 'error' | '' = '';
+  imagenPreview: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -30,21 +31,21 @@ export class AutoForm implements OnInit {
     private agenciaService: AgenciaService,
     private router: Router,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      marca:   ['', Validators.required],
-      modelo:  ['', Validators.required],
-      anio:    ['', Validators.required],
-      color:   ['', Validators.required],
-      precio:  [null, [Validators.required, Validators.min(1),
-                       Validators.pattern('^[0-9]*$')]],
-      placa:   ['', Validators.required],
+      marca: ['', Validators.required],
+      modelo: ['', Validators.required],
+      anio: ['', Validators.required],
+      color: ['', Validators.required],
+      precio: [null, [Validators.required, Validators.min(1), Validators.pattern('^[0-9]*$')]],
+      placa: ['', Validators.required],
+      imagen: [null],
       agencia: this.fb.group({
-        idagencia: [null, Validators.required]
-      })
+        idagencia: [null, Validators.required],
+      }),
     });
     this.cargarAgencias();
     const id = this.route.snapshot.paramMap.get('id');
@@ -61,7 +62,7 @@ export class AutoForm implements OnInit {
         const data = res?.object;
         this.agencias = Array.isArray(data) ? data : [];
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -73,8 +74,11 @@ export class AutoForm implements OnInit {
         if (auto) {
           this.form.patchValue({
             ...auto,
-            agencia: { idagencia: auto.agencia?.idagencia }
+            agencia: { idagencia: auto.agencia?.idagencia },
           });
+          if (auto.imagen) {
+            this.imagenPreview = auto.imagen;
+          }
         }
         this.loading = false;
         this.cdr.detectChanges();
@@ -83,12 +87,39 @@ export class AutoForm implements OnInit {
         this.showMessage('Error al cargar auto', 'error');
         this.loading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
+  onImagenSeleccionada(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+
+    if (file.size > 2 * 1024 * 1024) {
+      this.showMessage('La imagen no debe superar 2MB', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result as string;
+      this.imagenPreview = base64;
+      this.form.patchValue({ imagen: base64 });
+      this.cdr.detectChanges();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  quitarImagen(): void {
+    this.imagenPreview = null;
+    this.form.patchValue({ imagen: null });
+  }
+
   submit(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.submitting = true;
     const data: Auto = this.form.value;
     const op = this.isEdit
@@ -99,7 +130,7 @@ export class AutoForm implements OnInit {
       next: () => {
         this.showMessage(
           this.isEdit ? 'Auto actualizado correctamente' : 'Auto creado correctamente',
-          'success'
+          'success',
         );
         this.submitting = false;
         this.cdr.detectChanges();
@@ -109,15 +140,20 @@ export class AutoForm implements OnInit {
         this.showMessage('Error al guardar auto', 'error');
         this.submitting = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
-  get f() { return this.form.controls; }
+  get f() {
+    return this.form.controls;
+  }
 
   showMessage(msg: string, type: 'success' | 'error'): void {
     this.message = msg;
     this.messageType = type;
-    setTimeout(() => { this.message = ''; this.messageType = ''; }, 3500);
+    setTimeout(() => {
+      this.message = '';
+      this.messageType = '';
+    }, 3500);
   }
 }

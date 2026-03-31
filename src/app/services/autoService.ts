@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { enviroment } from '../environments/environment';
 import { Auto } from '../model/auto';
 import { Result } from '../model/result';
+import { Page } from '../model/page';
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +18,8 @@ export class AutoService {
     return this.http.post<Result<Auto>>(this.apiUrl, auto);
   }
 
-  consultarAutos(): Observable<Result<Auto[]>> {
-    return this.http.get<Result<Auto[]>>(this.apiUrl);
+  consultarAutos(page: number, size: number): Observable<Result<Page<Auto>>> {
+ return this.http.get<Result<Page<Auto>>>(`${this.apiUrl}?page=${page}&size=${size}`);
   }
 
   getAutoById(id: number): Observable<Result<Auto>> {

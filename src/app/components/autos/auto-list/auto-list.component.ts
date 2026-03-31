@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AutoService } from '../../../services/autoService';
 import { Auto } from '../../../model/auto';
+import { Agencia } from '../../../model/agencia';
+import { AgenciaService } from '../../../services/agenciaService';
 
 @Component({
   selector: 'app-auto-list',
@@ -14,6 +16,9 @@ import { Auto } from '../../../model/auto';
 })
 export class AutoList implements OnInit {
   autos: Auto[] = [];
+  todosLosAutos: Auto[] = [];
+  marcasDisponibles: String[] = [];
+  agencias: Agencia[] = [];
   loading = false;
   message = '';
   messageType: 'success' | 'error' | '' = '';
@@ -26,11 +31,26 @@ export class AutoList implements OnInit {
 
   constructor(
     private autoService: AutoService,
+    private agenciaService: AgenciaService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.cargarAutos();
+    this.cargarAgencias();
+  }
+
+
+  cargarAgencias(): void{
+    this.agenciaService.consultarAgencias().subscribe({
+      next:(res: any) => {
+        const data = res?.object;
+        this.agencias = Array.isArray(data) ? data : [];
+        this.cdr.detectChanges();
+      }
+
+    });
+
   }
 
   cargarAutos(): void {
@@ -38,7 +58,15 @@ export class AutoList implements OnInit {
     this.autoService.consultarAutos().subscribe({
       next: (res: any) => {
         const data = res?.object;
-        this.autos = Array.isArray(data) ? data : [];
+        this.todosLosAutos = Array.isArray(data) ? data : [];
+        this.autos = [...this.todosLosAutos];
+                console.log('Response completo:', res)
+
+
+        this.marcasDisponibles=[
+          ...new Set(this.todosLosAutos.map(a => a.marca).filter(Boolean))
+        ].sort();
+
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -51,7 +79,13 @@ export class AutoList implements OnInit {
   }
 
   buscarPorMarca(): void {
-    if (!this.filterMarca.trim()) return;
+    if(!this.filterMarca){
+      this.autos = [...this.todosLosAutos];
+      this.activeFilter = '';
+      this.cdr.detectChanges();
+      return;
+    }
+
     this.loading = true;
     this.activeFilter = 'marca';
     this.autoService.consutarPorMarca(this.filterMarca.trim()).subscribe({

@@ -21,49 +21,68 @@
   }
 
   <!-- Filtros -->
-  <div class="card mb-4">
-    <div class="card-body py-3">
-      <div class="row g-2 align-items-end">
-        <div class="col-md-3">
-          <label class="form-label mb-1">Marca</label>
-          <input type="text" [(ngModel)]="filterMarca"
-                 class="form-control" placeholder="Toyota, Honda..."
-                 (keyup.enter)="buscarPorMarca()" />
-        </div>
-        <div class="col-md-2">
-          <label class="form-label mb-1">ID Agencia</label>
-          <input type="number" [(ngModel)]="filterAgenciaId"
-                 class="form-control" placeholder="Ej: 2" />
-        </div>
-        <div class="col-md-2">
-          <label class="form-label mb-1">Precio mín</label>
-          <input type="number" [(ngModel)]="precioMin"
-                 class="form-control" placeholder="100000" />
-        </div>
-        <div class="col-md-2">
-          <label class="form-label mb-1">Precio máx</label>
-          <input type="number" [(ngModel)]="precioMax"
-                 class="form-control" placeholder="500000" />
-        </div>
-        <div class="col-md-3 d-flex gap-2">
-          <button class="btn btn-purple flex-fill" (click)="buscarPorMarca()">
-            <i class="bi bi-search me-1"></i>Marca
-          </button>
-          <button class="btn btn-outline-secondary flex-fill"
-                  style="border-radius:10px; border-color:var(--border-color); color:var(--purple-mid);"
-                  (click)="buscarPorPrecio()">
-            <i class="bi bi-currency-dollar me-1"></i>Precio
-          </button>
-          @if (activeFilter) {
-            <button class="btn btn-outline-danger" style="border-radius:10px;"
-                    (click)="limpiarFiltros()">
-              <i class="bi bi-x-lg"></i>
-            </button>
+  <!-- Filtros -->
+<div class="card mb-4">
+  <div class="card-body py-3">
+    <div class="row g-2 align-items-end">
+
+      <!-- Dropdown de marcas -->
+      <div class="col-md-3">
+        <label class="form-label mb-1">Marca</label>
+        <select [(ngModel)]="filterMarca" class="form-select"
+                style="border-color: var(--border-color);">
+          <option value="">Todas las marcas</option>
+          @for (marca of marcasDisponibles; track marca) {
+            <option [value]="marca">{{ marca }}</option>
           }
-        </div>
+        </select>
       </div>
+
+      <!-- Dropdown de agencias -->
+      <div class="col-md-3">
+        <label class="form-label mb-1">Agencia</label>
+        <select [(ngModel)]="filterAgenciaId" class="form-select"
+                style="border-color: var(--border-color);">
+          <option [ngValue]="null">Todas las agencias</option>
+          @for (ag of agencias; track ag.idagencia) {
+            <option [ngValue]="ag.idagencia">{{ ag.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Precio mín -->
+      <div class="col-md-2">
+        <label class="form-label mb-1">Precio mín</label>
+        <input type="number" [(ngModel)]="precioMin"
+               class="form-control" placeholder="100,000"
+               style="border-color: var(--border-color);" />
+      </div>
+
+      <!-- Precio máx -->
+      <div class="col-md-2">
+        <label class="form-label mb-1">Precio máx</label>
+        <input type="number" [(ngModel)]="precioMax"
+               class="form-control" placeholder="500,000"
+               style="border-color: var(--border-color);" />
+      </div>
+
+      <!-- Botones -->
+      <div class="col-md-2 d-flex flex-column gap-2">
+        <button class="btn btn-purple w-100" (click)="filterMarca ? buscarPorMarca() :
+                       filterAgenciaId ? buscarPorAgencia() : buscarPorPrecio()">
+          <i class="bi bi-search me-1"></i> Filtrar
+        </button>
+        @if (activeFilter) {
+          <button class="btn btn-outline-danger w-100"
+                  style="border-radius:10px;" (click)="limpiarFiltros()">
+            <i class="bi bi-x-lg me-1"></i> Limpiar
+          </button>
+        }
+      </div>
+
     </div>
   </div>
+</div>
 
   <!-- Loading -->
   @if (loading) {
